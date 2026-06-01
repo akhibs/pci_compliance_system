@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PCI-DSS Compliance System</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f0f2f5;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      .sidebar {
+        min-height: 100vh;
+        background: linear-gradient(180deg, #003366 0%, #0055a5 100%);
+        padding-top: 20px;
+        position: fixed;
+        width: 220px;
+      }
+
+      .sidebar a {
+        color: #cce0ff;
+        display: block;
+        padding: 12px 20px;
+        text-decoration: none;
+        font-size: 0.95rem;
+      }
+
+      .sidebar a:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: white;
+      }
+      .sidebar .brand {
+        color: white;
+        font-size: 1.1rem;
+        font-weight: bold;
+        padding: 10px 20px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 10px;
+      }
+
+      .main-content {
+        margin-left: 220px;
+        padding: 30px;
+      }
+
+      .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+      }
+
+      .stat-card {
+        border-radius: 12px;
+        padding: 20px;
+        color: white;
+      }
+      .stat-card.blue {
+        background: linear-gradient(135deg, #0055a5, #003366);
+      }
+      .stat-card.green {
+        background: linear-gradient(135deg, #28a745, #1a7a30);
+      }
+      .stat-card.red {
+        background: linear-gradient(135deg, #dc3545, #a71d2a);
+      }
+      .stat-card.orange {
+        background: linear-gradient(135deg, #fd7e14, #c96200);
+      }
+
+      .badge-pass {
+        background-color: #28a745;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+      }
+      .badge-fail {
+        background-color: #dc3545;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+      }
+      .badge-warning {
+        background-color: #fd7e14;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+      }
+
+      .topbar {
+        background: white;
+        padding: 15px 30px;
+        margin: -30px -30px 30px -30px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="brand">🔒 PCI Compliance</div>
+      <a href="/dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+      <a href="/targets/add"
+        ><i class="bi bi-plus-circle me-2"></i> Add Target</a
+      >
+      <a href="/remediation"><i class="bi bi-tools me-2"></i> Remediation</a>
+      <a href="/logout"><i class="bi bi-box-arrow-left me-2"></i> Logout</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <div class="topbar">
+        <h5 class="mb-0">{% block page_title %}Dashboard{% endblock %}</h5>
+        <span class="text-muted"
+          >👤 {{ current_user.username }} &nbsp;|&nbsp; {{ current_user.role
+          }}</span
+        >
+      </div>
+
+      <!-- FLASH MESSAGES -->
+      {% with messages = get_flashed_messages() %} {% if messages %} {% for
+      message in messages %}
+      <div class="alert alert-info alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+
+      <!-- PAGE CONTENT -->
+      {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

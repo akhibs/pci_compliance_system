@@ -1,0 +1,159 @@
+{% extends "base.html" %} {% block page_title %}dashboard{% endblock %} {% block
+content %}
+
+<!-- STAT CARDS -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="stat-card blue">
+      <div style="font-size: 2rem; font-weight: bold">{{ score }}%</div>
+      <div>Compliance Score</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card green">
+      <div style="font-size: 2rem; font-weight: bold">{{ total_passed }}</div>
+      <div>Checks Passed</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card red">
+      <div style="font-size: 2rem; font-weight: bold">{{ total_failed }}</div>
+      <div>Checks Failed</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card orange">
+      <div style="font-size: 2rem; font-weight: bold">{{ total_warning }}</div>
+      <div>Warnings</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <!-- CHART -->
+  <div class="col-md-5">
+    <div class="card p-4">
+      <h6 class="mb-3">Compliance Overview</h6>
+      <canvas id="complianceChart" height="220"></canvas>
+    </div>
+  </div>
+
+  <!-- SCAN TARGETS -->
+  <div class="col-md-7">
+    <div class="card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">Scan Targets</h6>
+        <a href="/targets/add" class="btn btn-sm btn-primary">+ Add Target</a>
+      </div>
+      {% if targets %}
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th>
+            <th>IP Address</th>
+            <th>Type</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for target in targets %}
+          <tr>
+            <td>{{ target.name }}</td>
+            <td>{{ target.ip_address }}</td>
+            <td>{{ target.system_type }}</td>
+            <td>
+              <a href="/scan/{{ target.id }}" class="btn btn-sm btn-success">
+                <i class="bi bi-play-fill"></i> Scan
+              </a>
+              <a href="/results/{{ target.id }}" class="btn btn-sm btn-info">
+                <i class="bi bi-eye"></i> Results
+              </a>
+              <a
+                href="/report/{{ target.id }}"
+                class="btn btn-sm btn-secondary"
+              >
+                <i class="bi bi-file-pdf"></i> PDF
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="text-center text-muted py-4">
+        <i class="bi bi-inbox" style="font-size: 2rem"></i>
+        <p class="mt-2">
+          No targets added yet. Click <b>Add Target</b> to begin.
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- RECENT CHECKS -->
+<div class="card p-4">
+  <h6 class="mb-3">Recent Scan Activity</h6>
+  {% if recent_checks %}
+  <table class="table table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>Requirement</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Risk</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for check in recent_checks %}
+      <tr>
+        <td>{{ check.requirement }}</td>
+        <td>{{ check.description }}</td>
+        <td>
+          {% if check.status == 'PASS' %}
+          <span class="badge-pass">PASS</span>
+          {% elif check.status == 'FAIL' %}
+          <span class="badge-fail">FAIL</span>
+          {% else %}
+          <span class="badge-warning">WARNING</span>
+          {% endif %}
+        </td>
+        <td>{{ check.risk_level }}</td>
+        <td>{{ check.scanned_at.strftime('%Y-%m-%d %H:%M') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="text-center text-muted py-4">
+    <i class="bi bi-clipboard-data" style="font-size: 2rem"></i>
+    <p class="mt-2">No scans performed yet.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %} {% block scripts %}
+<script>
+  const ctx = document.getElementById("complianceChart").getContext("2d");
+  new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Passed", "Failed", "Warnings"],
+      datasets: [
+        {
+          data: [{ total_passed }, { total_failed }, { total_warning }],
+          backgroundColor: ["#28a745", "#dc3545", "#fd7e14"],
+          borderWidth: 0,
+        },
+      ],
+    },
+    option: {
+      responsive: true,
+      plugins: {
+        legend: { position: "bottom" },
+      },
+    },
+  });
+</script>
+{% endblock %}
