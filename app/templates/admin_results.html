@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block page_title %}Admin – Results for {{ target.name }}{% endblock %}
+
+{% block content %}
+
+<div class="card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-1">{{ target.name }}</h5>
+            <span class="text-muted">
+                {{ target.ip_address }} | {{ target.system_type }}
+            </span><br>
+            <span class="text-muted">
+                Owner: <b>{{ owner.username }}</b> ({{ owner.email }})
+            </span>
+        </div>
+        <div>
+            <a href="/admin/report/{{ target.id }}" class="btn btn-secondary">
+                <i class="bi bi-file-pdf"></i> Download PDF
+            </a>
+            <a href="/admin" class="btn btn-outline-primary ms-2">
+                Back to Admin
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card blue">
+            <div style="font-size:2rem; font-weight:bold;">{{ score }}%</div>
+            <div>Compliance Score</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card green">
+            <div style="font-size:2rem; font-weight:bold;">{{ passed }}</div>
+            <div>Passed</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card red">
+            <div style="font-size:2rem; font-weight:bold;">{{ failed }}</div>
+            <div>Failed</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card orange">
+            <div style="font-size:2rem; font-weight:bold;">{{ warning }}</div>
+            <div>Warnings</div>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4">
+    <h6 class="mb-3">Detailed Findings</h6>
+    {% if checks %}
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Risk Level</th>
+                <th>Evidence</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for check in checks %}
+            <tr>
+                <td><b>{{ check.requirement }}</b></td>
+                <td>{{ check.description }}</td>
+                <td>
+                    {% if check.status == 'PASS' %}
+                        <span class="badge-pass">PASS</span>
+                    {% elif check.status == 'FAIL' %}
+                        <span class="badge-fail">FAIL</span>
+                    {% else %}
+                        <span class="badge-warning">WARNING</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if check.risk_level == 'Critical' %}
+                        <span style="color:red; font-weight:bold;">Critical</span>
+                    {% elif check.risk_level == 'High' %}
+                        <span style="color:red;">High</span>
+                    {% elif check.risk_level == 'Medium' %}
+                        <span style="color:orange;">Medium</span>
+                    {% else %}
+                        <span style="color:green;">Low</span>
+                    {% endif %}
+                </td>
+                <td><small>{{ check.evidence }}</small></td>
+                <td><small>{{ check.scanned_at.strftime('%Y-%m-%d %H:%M') }}</small></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted text-center py-4">No results found for this target.</p>
+    {% endif %}
+</div>
+{% endblock %}

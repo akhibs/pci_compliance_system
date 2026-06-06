@@ -1,13 +1,32 @@
 import os
 from app import create_app, db
+from app.models import User
+from werkzeug.security import generate_password_hash
 
 
 app = create_app()
 
 with app.app_context():
-    #Create all databasetable
     db.create_all()
-    print("database ready")
+    
+    #CREATE admin account if it doesnt exist
+    existing = User.query.filter_by(username='admin').first()
+    if not existing:
+        admin = User(
+            username = 'admin',
+            email = 'admin@pci.com',
+            password = generate_password_hash('admin123'),
+            role = 'admin'
+        )
+        db.session.add(admin)
+        db.session.commit()
+        print("Admin account created")
+        print("username: admin")
+        print("password: admin123")
+    else:
+        print("DATABASE READY")
+        
+        
     
   
         

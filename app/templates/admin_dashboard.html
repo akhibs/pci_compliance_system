@@ -1,0 +1,170 @@
+{% extends "base.html" %} {% block page_title %}Admin Dashboard{% endblock %} {%
+block content %}
+
+<!-- STAT CARDS -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="stat-card blue">
+      <div style="font-size: 2rem; font-weight: bold">{{ score }}%</div>
+      <div>Overall Compliance Score</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card green">
+      <div style="font-size: 2rem; font-weight: bold">{{ total_passed }}</div>
+      <div>Total Passed</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card red">
+      <div style="font-size: 2rem; font-weight: bold">{{ total_failed }}</div>
+      <div>Total Failed</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card orange">
+      <div style="font-size: 2rem; font-weight: bold">{{ users|length }}</div>
+      <div>Registered Users</div>
+    </div>
+  </div>
+</div>
+
+<!-- ALL USERS -->
+<div class="card p-4 mb-4">
+  <h6 class="mb-3">👥 Registered Users</h6>
+  {% if users %}
+  <table class="table table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>#</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td><span class="badge-warning">{{ user.role }}</span></td>
+        <td><small>{{ user.created_at.strftime('%Y-%m-%d') }}</small></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-muted text-center">No users registered yet.</p>
+  {% endif %}
+</div>
+
+<!-- ALL SCAN TARGETS -->
+<div class="card p-4 mb-4">
+  <h6 class="mb-3">🖥️ All Scan Targets</h6>
+  {% if targets %}
+  <table class="table table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>Target Name</th>
+        <th>IP Address</th>
+        <th>Type</th>
+        <th>Owner</th>
+        <th>Added</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for target, owner in targets %}
+      <tr>
+        <td>{{ target.name }}</td>
+        <td>{{ target.ip_address }}</td>
+        <td>{{ target.system_type }}</td>
+        <td>
+          <span class="badge-pass">{{ owner.username }}</span>
+        </td>
+        <td><small>{{ target.created_at.strftime('%Y-%m-%d') }}</small></td>
+        <td>
+          <a href="/admin/results/{{ target.id }}" class="btn btn-sm btn-info">
+            <i class="bi bi-eye"></i> Results
+          </a>
+          <a
+            href="/admin/report/{{ target.id }}"
+            class="btn btn-sm btn-secondary"
+          >
+            <i class="bi bi-file-pdf"></i> PDF
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-muted text-center">No targets scanned yet.</p>
+  {% endif %}
+</div>
+
+<!-- RECENT ACTIVITY -->
+<div class="card p-4">
+  <h6 class="mb-3">📋 Recent Activity — Who Did What</h6>
+  {% if recent_activity %}
+  <table class="table table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>User</th>
+        <th>Target</th>
+        <th>Requirement</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Risk</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for check, target, user in recent_activity %}
+      <tr>
+        <td><span class="badge-pass">{{ user.username }}</span></td>
+        <td>{{ target.name }}</td>
+        <td><b>{{ check.requirement }}</b></td>
+        <td><small>{{ check.description }}</small></td>
+        <td>
+          {% if check.status == 'PASS' %}
+          <span class="badge-pass">PASS</span>
+          {% elif check.status == 'FAIL' %}
+          <span class="badge-fail">FAIL</span>
+          {% else %}
+          <span class="badge-warning">WARNING</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if check.risk_level == 'Critical' %}
+          <span style="color: red; font-weight: bold">Critical</span>
+          {% elif check.risk_level == 'High' %}
+          <span style="color: red">High</span>
+          {% elif check.risk_level == 'Medium' %}
+          <span style="color: orange">Medium</span>
+          {% else %}
+          <span style="color: green">Low</span>
+          {% endif %}
+        </td>
+        <td>
+          <small>{{ check.scanned_at.strftime('%Y-%m-%d %H:%M') }}</small>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-muted text-center">No activity recorded yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %} {% block scripts %}
+<script>
+  // Auto refresh every 60 seconds
+  setTimeout(function () {
+    location.reload();
+  }, 60000);
+</script>
+{% endblock %}
